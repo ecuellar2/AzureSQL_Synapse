@@ -51,4 +51,5 @@ and j.name = 'Job name'
 
 select * from catalog.executions where status = 2
 
-select *  from internal.event_messages where operation_id = execution_ID order by event_message_id desc 
+ 
+select * from catalog.event_messages where operation_id = 116081 order by message_time desc
