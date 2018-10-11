@@ -1,4 +1,15 @@
 
+--Azure permissions for users
+SELECT DP1.name AS DatabaseRoleName,  isnull (DP2.name, 'No members') AS DatabaseUserName   
+FROM sys.database_role_members AS DRM  
+RIGHT OUTER JOIN sys.database_principals AS DP1  
+    ON DRM.role_principal_id = DP1.principal_id  
+LEFT OUTER JOIN sys.database_principals AS DP2  
+    ON DRM.member_principal_id = DP2.principal_id  
+WHERE DP1.type = 'R'
+ORDER BY DP1.name;  
+
+
 -- permissions list
 SELECT users.name as user_name, users.uid as user_id, db_principal.name, db_principal.type_desc 
 FROM sys.sysusers users  right  JOIN  sys.database_role_members rolemember ON users.uid = rolemember.member_principal_id 
