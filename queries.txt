@@ -55,6 +55,28 @@ WHERE referenced_entity_name = 'tablename'
        DATETIME_PRECISION
 FROM   INFORMATION_SCHEMA.COLUMNS where table_name = ''
 
+-- get all places where a column is being referenced as dependency
+SELECT 
+      SCHEMA_NAME(schema_id)+'.'+[name] as objectname
+      ,type_desc
+     ,referenced_schema_name AS SchemaName
+,referenced_entity_name AS TableName
+,referenced_minor_name  AS ColumnName
+  FROM [sys].[all_objects] ob cross apply sys.dm_sql_referenced_entities ( SCHEMA_NAME(schema_id)+'.'+[name], 'OBJECT') e
+
+  where is_ms_shipped = 0 and type_desc in ('AGGREGATE_FUNCTION'
+,'SQL_SCALAR_FUNCTION'
+,'SQL_INLINE_TABLE_VALUED_FUNCTION'
+,'SQL_STORED_PROCEDURE'
+,'SQL_TABLE_VALUED_FUNCTION'
+,'SQL_TRIGGER'
+,'VIEW')
+and name !='sp_upgraddiagrams'
+and referenced_entity_name  = ''  -- table
+and referenced_schema_name = ''  --- schema
+--and referenced_minor_name = 'columnname' 
+order by 5
+
 -- get all indexes
 select s.name, t.name as table_name, i.name, c.name as column_name from sys.tables t
 inner join sys.schemas s on t.schema_id = s.schema_id
