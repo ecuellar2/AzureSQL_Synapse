@@ -56,14 +56,10 @@ WHERE referenced_entity_name = 'tablename'
 FROM   INFORMATION_SCHEMA.COLUMNS where table_name = ''
 
 -- get all places where a column is being referenced as dependency
-SELECT 
-      SCHEMA_NAME(schema_id)+'.'+[name] as objectname
-      ,type_desc
-     ,referenced_schema_name AS SchemaName
-,referenced_entity_name AS TableName
-,referenced_minor_name  AS ColumnName
+SELECT SCHEMA_NAME(schema_id)+'.'+[name] as objectname
+,type_desc ,referenced_schema_name AS SchemaName
+,referenced_entity_name AS TableName ,referenced_minor_name  AS ColumnName
   FROM [sys].[all_objects] ob cross apply sys.dm_sql_referenced_entities ( SCHEMA_NAME(schema_id)+'.'+[name], 'OBJECT') e
-
   where is_ms_shipped = 0 and type_desc in ('AGGREGATE_FUNCTION'
 ,'SQL_SCALAR_FUNCTION'
 ,'SQL_INLINE_TABLE_VALUED_FUNCTION'
@@ -82,8 +78,7 @@ select s.name, t.name as table_name, i.name, c.name as column_name from sys.tabl
 inner join sys.schemas s on t.schema_id = s.schema_id
 inner join sys.indexes i on i.object_id = t.object_id
 inner join sys.index_columns ic on ic.object_id = t.object_id
-inner join sys.columns c on c.object_id = t.object_id and
-        ic.column_id = c.column_id
+inner join sys.columns c on c.object_id = t.object_id and ic.column_id = c.column_id
 where i.index_id > 0    
  and i.type in (1, 2) -- clustered & nonclustered only
  --and i.is_primary_key = 0 -- do not include PK indexes
@@ -123,10 +118,8 @@ SELECT
     + ISNULL(QuoteName(referenced_database_name) + '.', '')
     + ISNULL(QuoteName(referenced_schema_name) + '.', '')
     + QuoteName(referenced_entity_name) AS MissingReferencedObject
-FROM
-    sys.sql_expression_dependencies sed
-        LEFT JOIN sys.objects o
-            ON sed.referencing_id=o.object_id
+FROM sys.sql_expression_dependencies sed
+LEFT JOIN sys.objects o ON sed.referencing_id=o.object_id
 WHERE
     (is_ambiguous = 0)
     AND (OBJECT_ID(ISNULL(QuoteName(referenced_server_name) + '.', '')
