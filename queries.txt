@@ -9,7 +9,6 @@ LEFT OUTER JOIN sys.database_principals AS DP2
 WHERE DP1.type = 'R'
 ORDER BY DP1.name;  
 
-
 -- permissions list
 SELECT users.name as user_name, users.uid as user_id, db_principal.name, db_principal.type_desc 
 FROM sys.sysusers users  right  JOIN  sys.database_role_members rolemember ON users.uid = rolemember.member_principal_id 
@@ -27,7 +26,16 @@ SELECT p.[name] AS 'PrincipalName'
     ON dbp.[grantee_principal_id] = p.[principal_id] LEFT JOIN [sys].[database_principals] p2
     ON dbp.[grantor_principal_id] = p2.[principal_id]
 	where p.[name]  in ( 'user_name', 'role_name')
+	
+---------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------
+--- active sesions and queries
+select * FROM sys.dm_exec_sessions where original_login_name = 'xxx'-- use this to get session_id and use in query below
 
+SELECT sqltext.TEXT, req.session_id, req.status, req.command, req.cpu_time, req.total_elapsed_time
+FROM sys.dm_exec_requests req CROSS APPLY sys.dm_exec_sql_text(sql_handle) AS sqltext where session_id = xxx
+---------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------
 -- check dependencies on table 
 SELECT 
 referencing_object_name = o.name, 
@@ -41,19 +49,6 @@ LEFT OUTER JOIN sys.objects o1
 ON sed.referenced_id = o1.[object_id] 
 WHERE referenced_entity_name = 'tablename'
 
--- get all columns for a table
-  SELECT TABLE_SCHEMA ,
-       TABLE_NAME ,
-       COLUMN_NAME ,
-       ORDINAL_POSITION ,
-       COLUMN_DEFAULT ,
-       DATA_TYPE ,
-       CHARACTER_MAXIMUM_LENGTH ,
-       NUMERIC_PRECISION ,
-       NUMERIC_PRECISION_RADIX ,
-       NUMERIC_SCALE ,
-       DATETIME_PRECISION
-FROM   INFORMATION_SCHEMA.COLUMNS where table_name = ''
 
 -- get all places where a column is being referenced as dependency
 SELECT SCHEMA_NAME(schema_id)+'.'+[name] as objectname
@@ -72,7 +67,21 @@ and referenced_entity_name  = ''  -- table
 and referenced_schema_name = ''  --- schema
 --and referenced_minor_name = 'columnname' 
 order by 5
-
+---------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------
+-- get all columns for a table
+  SELECT TABLE_SCHEMA ,
+       TABLE_NAME ,
+       COLUMN_NAME ,
+       ORDINAL_POSITION ,
+       COLUMN_DEFAULT ,
+       DATA_TYPE ,
+       CHARACTER_MAXIMUM_LENGTH ,
+       NUMERIC_PRECISION ,
+       NUMERIC_PRECISION_RADIX ,
+       NUMERIC_SCALE ,
+       DATETIME_PRECISION
+FROM   INFORMATION_SCHEMA.COLUMNS where table_name = ''
 -- get all indexes
 select s.name, t.name as table_name, i.name, c.name as column_name from sys.tables t
 inner join sys.schemas s on t.schema_id = s.schema_id
@@ -87,7 +96,8 @@ where i.index_id > 0
  and i.is_hypothetical = 0
  and ic.key_ordinal > 0
 order by t.name
-
+---------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------
 -- Jobs 
 SELECT
 ja.job_id,
