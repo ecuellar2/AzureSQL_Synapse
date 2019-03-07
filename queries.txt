@@ -1,14 +1,4 @@
 
---Azure permissions for users
-SELECT DP1.name AS DatabaseRoleName,  isnull (DP2.name, 'No members') AS DatabaseUserName   
-FROM sys.database_role_members AS DRM  
-RIGHT OUTER JOIN sys.database_principals AS DP1  
-    ON DRM.role_principal_id = DP1.principal_id  
-LEFT OUTER JOIN sys.database_principals AS DP2  
-    ON DRM.member_principal_id = DP2.principal_id  
-WHERE DP1.type = 'R'
-ORDER BY DP1.name;  
-
 -- permissions list
 SELECT users.name as user_name, users.uid as user_id, db_principal.name, db_principal.type_desc 
 FROM sys.sysusers users  right  JOIN  sys.database_role_members rolemember ON users.uid = rolemember.member_principal_id 
@@ -82,6 +72,7 @@ order by 5
        NUMERIC_SCALE ,
        DATETIME_PRECISION
 FROM   INFORMATION_SCHEMA.COLUMNS where table_name = ''
+
 -- get all indexes
 select s.name, t.name as table_name, i.name, c.name as column_name from sys.tables t
 inner join sys.schemas s on t.schema_id = s.schema_id
@@ -96,6 +87,31 @@ where i.index_id > 0
  and i.is_hypothetical = 0
  and ic.key_ordinal > 0
 order by t.name
+----------------------------------------------------------------------------------------------
+--  Getting table record counts
+	SELECT SCHEMA_NAME(schema_id) AS [SchemaName],
+	[Tables].name AS [TableName],
+	SUM([Partitions].[rows]) AS [TotalRowCount]
+	FROM sys.tables AS [Tables]
+	JOIN sys.partitions AS [Partitions]
+	ON [Tables].[object_id] = [Partitions].[object_id]
+	AND [Partitions].index_id IN ( 0, 1 )
+	-- WHERE [Tables].name = N'name of the table'
+	GROUP BY SCHEMA_NAME(schema_id), [Tables].name
+	order by [TableName] asc
+----------------------------------------------------------------------------------------------
+SSRS queries
+select * from Subscriptions
+select top 10 * from ExecutionLog3 where ItemPath like ('%Report%') order by TimeStart desc
+select * from ReportSchedule where SubscriptionID = 'xxxx'
+select * from event 
+----------------------------------------------------------------------------------------------
+-- How to cleanly compile procedures
+IF OBJECT_ID('dbo.uspGetEmployeeDetails') IS NULL -- Check if SP Exists
+ EXEC('CREATE PROCEDURE dbo.uspGetEmployeeDetails AS SET NOCOUNT ON;') -- Create dummy/empty SP
+GO 
+ALTER PROCEDURE dbo.uspGetEmployeeDetails -- Alter the SP Always
+GO
 ---------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------
 -- Jobs 
