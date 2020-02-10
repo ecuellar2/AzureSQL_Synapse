@@ -1,2 +1,2 @@
 # Azure SQL
-Useful scripts for sql server
+Useful scripts for Azure SQL and Synapse
