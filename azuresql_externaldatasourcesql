@@ -1,0 +1,100 @@
+
+CREATE MASTER KEY ENCRYPTION BY PASSWORD='x';
+----------------------------------------------------------
+-- steps below for elastic query sqldw (source) to azure sql  (sink)
+in master  create  log in xx.database.windows.net -- sink
+CREATE LOGIN ElasticQueryUser WITH PASSWORD = 'xx';  
+----------------------------------------------------------
+use  dw as source
+in master  create  log in xx.database.windows.net
+CREATE LOGIN ElasticQueryReader WITH PASSWORD = 'xx';  
+
+In source  db dw
+CREATE USER ElasticQueryReader FOR LOGIN ElasticQueryReader WITH DEFAULT_SCHEMA = dbo;
+EXEC sp_addrolemember N'db_datareader', N'ElasticQueryReader';
+EXEC sp_addrolemember N'db_datawriter', N'ElasticQueryReader';
+
+-- sink db azure sql
+CREATE USER ElasticQueryUser FOR LOGIN ElasticQueryUser WITH DEFAULT_SCHEMA = dbo;
+EXEC sp_addrolemember N'db_owner', N'ElasticQueryUser';  ---- change later but requires CONTROL permission on database
+CREATE DATABASE SCOPED CREDENTIAL ElasticQueryUserCredential WITH IDENTITY = 'ElasticQueryUser', SECRET = 'xx'; 
+CREATE DATABASE SCOPED CREDENTIAL ElasticQueryReaderCredential WITH IDENTITY = 'ElasticQueryReader', SECRET = 'xx'; 
+
+
+CREATE EXTERNAL DATA SOURCE ext_dw WITH 
+(TYPE = RDBMS, CREDENTIAL = ElasticQueryReaderCredential, DATABASE_NAME = 'dw', LOCATION = 'xx.database.windows.net');
+
+CREATE EXTERNAL TABLE [dbo].[test_external]
+( [FISCAL_MONTH] [varchar](100) )
+WITH ( DATA_SOURCE = ext_dw, SCHEMA_NAME = N'dbo',OBJECT_NAME = N'tabletest')
+
+----------------------------------------------------------
+-- steps below for elastic query sql to sql  
+in master  create  log in xx.database.windows.net
+CREATE LOGIN ElasticQueryUser WITH PASSWORD = 'xx';  
+CREATE LOGIN ElasticQueryReader WITH PASSWORD = 'xx';  
+----------------------------------------------------------
+use azure_sql -- source db
+CREATE USER ElasticQueryReader FOR LOGIN ElasticQueryReader WITH DEFAULT_SCHEMA = dbo;
+EXEC sp_addrolemember N'db_datareader', N'ElasticQueryReader';
+EXEC sp_addrolemember N'db_datawriter', N'ElasticQueryReader';
+----------------------------------------------------------
+azure sql
+CREATE USER ElasticQueryUser FOR LOGIN ElasticQueryUser WITH DEFAULT_SCHEMA = dbo;
+EXEC sp_addrolemember N'db_owner', N'ElasticQueryUser';  ---- change later but requires CONTROL permission on database
+CREATE DATABASE SCOPED CREDENTIAL ElasticQueryUserCredential WITH IDENTITY = 'ElasticQueryUser', SECRET = 'zz'; 
+CREATE DATABASE SCOPED CREDENTIAL ElasticQueryReaderCredential WITH IDENTITY = 'ElasticQueryReader', SECRET = 'zz'; 
+
+
+CREATE EXTERNAL DATA SOURCE ext_sql WITH 
+(TYPE = RDBMS, CREDENTIAL = ElasticQueryReaderCredential, DATABASE_NAME = 'azuresql', LOCATION = 'xx.database.windows.net');
+
+CREATE EXTERNAL TABLE [dbo].[test_external]
+( [testid] [int] )
+WITH ( DATA_SOURCE = ext_sql, SCHEMA_NAME = N'dbo',OBJECT_NAME = N'test')
+
+=================================================================
+--LOCATION BELOW MUST NOT HAVE TRAILING FORWARD SLASH!
+msft support example:
+CREATE EXTERNAL DATA SOURCE xxsourcedata
+WITH ( TYPE = BLOB_STORAGE,
+          LOCATION = 'https://xxx.blob.core.windows.net/adls2'
+          , CREDENTIAL= msi_cred
+);
+
+--- CREDENTIAL  = [https://account.blob.core.winodws.net/container/] in sas token example below 
+
+
+BULK
+INSERT [dbo].[CSVTest]
+FROM 'csv.txt'
+WITH
+(
+DATA_SOURCE = 'xxxsourcedata',
+FIELDTERMINATOR = ',',
+ROWTERMINATOR = '\n'
+)
+GO
+SELECT *
+FROM CSVTest
+GO
+
+msft tutorial example:use sas token for identity, remove the "?" from sas token 
+create database scoped credential [https://account.blob.core.winodws.net/container/]
+with identity = 'SHARED ACCESS SIGNATURE'
+SECRET = ''
+
+set nocount on
+bulk insert table_name
+from 'dataset/folder/filename.dat'
+with
+(
+data_source = 'datsourcename' --- external data source
+,datafiletype = 'char'
+,fieldterminator = '\|'
+,rowterminator = '\|\n'
+,batchsize = 100000
+,tablock  -- minimize log records
+)
+
+
