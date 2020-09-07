@@ -1,7 +1,7 @@
 
 CREATE MASTER KEY ENCRYPTION BY PASSWORD='x';
 ----------------------------------------------------------
--- steps below for elastic query sqldw (source) to azure sql  (sink)
+-- steps below for remote query sqldw (source) to azure sql  (sink)
 in master  create  log in xx.database.windows.net -- sink
 CREATE LOGIN ElasticQueryUser WITH PASSWORD = 'xx';  
 ----------------------------------------------------------
@@ -29,7 +29,7 @@ CREATE EXTERNAL TABLE [dbo].[test_external]
 WITH ( DATA_SOURCE = ext_dw, SCHEMA_NAME = N'dbo',OBJECT_NAME = N'tabletest')
 
 ----------------------------------------------------------
--- steps below for elastic query sql to sql  
+-- steps below for remote query azure sql to azure sql
 in master  create  log in xx.database.windows.net
 CREATE LOGIN ElasticQueryUser WITH PASSWORD = 'xx';  
 CREATE LOGIN ElasticQueryReader WITH PASSWORD = 'xx';  
@@ -54,6 +54,7 @@ CREATE EXTERNAL TABLE [dbo].[test_external]
 WITH ( DATA_SOURCE = ext_sql, SCHEMA_NAME = N'dbo',OBJECT_NAME = N'test')
 
 =================================================================
+--Example tutorials below for reference only.
 --LOCATION BELOW MUST NOT HAVE TRAILING FORWARD SLASH!
 msft support example:
 CREATE EXTERNAL DATA SOURCE xxsourcedata
