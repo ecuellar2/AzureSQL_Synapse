@@ -6,6 +6,15 @@ select top 10* from  sys.dm_pdw_exec_sessions where login_name not in ('user') o
 select top 10* from  sys.workload_management_workload_groups
 select top 10 * from sys.dm_pdw_exec_requests
 select COUNT_BIG(1) from sql dw table
+EXEC sp_spaceused N'schema.table';  
+
+/*Use below if more than 60M records
+Stage in etl schema as DISTRIBUTION ROUND_ROBIN (default), CLUSTERED COLUMNSTORE (default) > DISTRIBUTION HASH, CLUSTERED COLUMNSTORE
+Use below if less than 60M records
+Stage in etl schema as DISTRIBUTION ROUND_ROBIN, HEAP > DISTRIBUTION HASH, CLUSTERED COLUMNSTORE
+*/
+
+
 
 -- users and roles 
 SELECT DP1.name AS DatabaseRoleName,   
