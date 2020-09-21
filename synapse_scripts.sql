@@ -1,10 +1,10 @@
 --SQL DW
-select top 10* from dbo.Query_stats_active_requests where classifier_Name is null or classifier_name not in ('username') order by status
-select top 10* from sys.workload_management_workload_classifiers 
-select top 10* from sys.dm_workload_management_workload_groups_stats
-select top 10* from  sys.dm_pdw_exec_sessions where login_name not in ('user') order by status
-select top 10* from  sys.workload_management_workload_groups
-select top 10 * from sys.dm_pdw_exec_requests
+select top 100* from dbo.Query_stats_active_requests where classifier_Name is null or classifier_name not in ('username') order by status
+select top 100* from sys.workload_management_workload_classifiers 
+select top 100* from sys.dm_workload_management_workload_groups_stats
+select top 100* from  sys.dm_pdw_exec_sessions where login_name not in ('user') order by status
+select top 100* from  sys.workload_management_workload_groups
+select top 100* from sys.dm_pdw_exec_requests
 select COUNT_BIG(1) from sql dw table
 EXEC sp_spaceused N'schema.table';  
 
