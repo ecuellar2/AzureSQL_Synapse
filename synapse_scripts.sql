@@ -34,6 +34,30 @@ FROM sys.database_principals AS pr
 JOIN sys.database_permissions AS pe  
     ON pe.grantee_principal_id = pr.principal_id
 
+-- permissions for a schema
+DECLARE @SCHEMA varchar(255) = 'schema_name'
+SELECT DISTINCT
+CASE WHEN prmssn.state = 'D' then 'Deny'  WHEN prmssn.state = 'R' THEN 'REVOKE' WHEN prmssn.state = 'G' THEN 'Grant'   ELSE  ' Grant With Grant Option' end as permissionstate,
+grantor_principal.name AS [Grantor],
+prmssn.permission_name AS [name],
+class_desc,Grantees.grantee
+FROM
+sys.schemas AS s
+INNER JOIN sys.database_permissions AS prmssn ON prmssn.major_id=s.schema_id AND prmssn.minor_id=0 AND prmssn.class=3
+INNER JOIN sys.database_principals AS grantor_principal ON grantor_principal.principal_id = prmssn.grantor_principal_id
+INNER JOIN sys.database_principals AS grantee_principal ON grantee_principal.principal_id = prmssn.grantee_principal_id
+INNER JOIN (SELECT
+grantee_principal.name AS [Grantee]
+FROM
+sys.schemas AS s
+INNER JOIN sys.database_permissions AS prmssn ON prmssn.major_id=s.schema_id AND prmssn.minor_id=0 AND prmssn.class=3
+INNER JOIN sys.database_principals AS grantee_principal ON grantee_principal.principal_id = prmssn.grantee_principal_id
+WHERE
+(s.name= @SCHEMA)) as Grantees
+on Grantees.grantee = grantee_principal.name
+WHERE
+((s.name=@SCHEMA))
+
 -- list of tables
 select schema_name(schema_id) as schema_name, name from sys.tables where name like ('%test%')
 
