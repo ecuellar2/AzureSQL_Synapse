@@ -18,13 +18,11 @@ SELECT p.[name] AS 'PrincipalName'
 	where p.[name]  in ( 'user_name', 'role_name')
 	
 ---------------------------------------------------------------------------------------------------------------------
----------------------------------------------------------------------------------------------------------------------
 --- active sesions and queries
 select * FROM sys.dm_exec_sessions where original_login_name = 'xxx'-- use this to get session_id and use in query below
 
 SELECT sqltext.TEXT, req.session_id, req.status, req.command, req.cpu_time, req.total_elapsed_time
 FROM sys.dm_exec_requests req CROSS APPLY sys.dm_exec_sql_text(sql_handle) AS sqltext where session_id = xxx
----------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------------------
 -- check dependencies on table 
 SELECT 
@@ -58,7 +56,6 @@ and referenced_schema_name = ''  --- schema
 --and referenced_minor_name = 'columnname' 
 order by 5
 ---------------------------------------------------------------------------------------------------------------------
----------------------------------------------------------------------------------------------------------------------
 -- get all columns for a table
   SELECT TABLE_SCHEMA ,
        TABLE_NAME ,
@@ -87,6 +84,14 @@ where i.index_id > 0
  and i.is_hypothetical = 0
  and ic.key_ordinal > 0
 order by t.name
+
+--List All ColumnStore Indexes and tables
+SELECT OBJECT_SCHEMA_NAME(OBJECT_ID) SchemaName,
+ OBJECT_NAME(OBJECT_ID) TableName,
+ i.name AS IndexName, i.type_desc IndexType
+FROM sys.indexes AS i 
+WHERE is_hypothetical = 0 AND i.index_id <> 0 
+ AND i.type_desc IN ('CLUSTERED COLUMNSTORE','NONCLUSTERED COLUMNSTORE')
 ----------------------------------------------------------------------------------------------
 --  Getting table record counts
 	SELECT SCHEMA_NAME(schema_id) AS [SchemaName],
