@@ -33,3 +33,10 @@ Guarantee Concurrency = MIN_PERCENTAGE_RESOURCE / REQUEST_MIN_RESOURCE_GRANT_PER
 REQUEST_MIN_RESOURCE_GRANT_PERCENT must be higher than .75, and a factor of .25, as well as a factor of you min_percentage_resource.
 CAP_PERCENTAGE_RESOURCE is the max resources the workload group can have.
 */
+
+create workload Classifier loader_user_wlgname
+WITH ( WORKLOAD_GROUP = 'wlgname'
+,MEMBERNAME = 'loader_user' );
+
+--To drop a group ( the classifiers of a group must be dropped first)
+--DROP WORKLOAD CLASSIFIER xxx;
