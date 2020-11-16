@@ -40,10 +40,7 @@ WITH ( WORKLOAD_GROUP = 'wlgname'
 
 --To drop a group ( the classifiers of a group must be dropped first)
 --DROP WORKLOAD CLASSIFIER xxx;
---Get current classifiers
-SELECT WC.classifier_id, WC.name, WC.group_name, WC.importance, WC.is_enabled, CD.classifier_type, CD.classifier_value
-FROM sys.workload_management_workload_classifiers WC
-INNER JOIN sys.workload_management_workload_classifier_details CD ON WC.classifier_id = CD.classifier_id;
+
 
 -- Workload Groups Examples
 
@@ -108,7 +105,6 @@ FROM sys.workload_management_workload_groups;
 SELECT WC.classifier_id, WC.name, WC.group_name, WC.importance, WC.is_enabled, CD.classifier_type, CD.classifier_value
 FROM sys.workload_management_workload_classifiers WC
 INNER JOIN sys.workload_management_workload_classifier_details CD ON WC.classifier_id = CD.classifier_id;
-
 
 -- View RunTime values
 
