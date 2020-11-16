@@ -21,6 +21,7 @@ CREATE USER [AD_GROUP_NAME] FROM EXTERNAL PROVIDER; --- may be needed in master 
 EXEC sp_addrolemember 'db_owner', 'AD_GROUP_NAME';
 
 CREATE SCHEMA [etl];
+GRANT CONTROL ON SCHEMA::[etl] to [ad_group_name];
 
 CREATE WORKLOAD GROUP wlgname WITH
 ( REQUEST_MIN_RESOURCE_GRANT_PERCENT = 10
