@@ -22,3 +22,14 @@ EXEC sp_addrolemember 'db_owner', 'AD_GROUP_NAME';
 
 CREATE SCHEMA [etl];
 
+CREATE WORKLOAD GROUP xxx WITH
+( REQUEST_MIN_RESOURCE_GRANT_PERCENT = 10
+ , MIN_PERCENTAGE_RESOURCE = 80                      
+ , REQUEST_MAX_RESOURCE_GRANT_PERCENT = 12
+ ,CAP_PERCENTAGE_RESOURCE = 90)
+
+/* 
+Guarantee Concurrency = MIN_PERCENTAGE_RESOURCE / REQUEST_MIN_RESOURCE_GRANT_PERCENT = 80/10 = 8 slots @ 10% 
+REQUEST_MIN_RESOURCE_GRANT_PERCENT must be higher than .75, and a factor of .25, as well as a factor of you min_percentage_resource.
+CAP_PERCENTAGE_RESOURCE is the max resources the workload group can have.
+*/
