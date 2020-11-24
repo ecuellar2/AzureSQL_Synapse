@@ -1,3 +1,6 @@
+Log in as AD admin to create scoped credential:
+CREATE DATABASE SCOPED CREDENTIAL msi_cred WITH IDENTITY = 'Managed Service Identity';
+
 CREATE EXTERNAL FILE FORMAT uncompressedparquet
 WITH (  
     FORMAT_TYPE = PARQUET  
