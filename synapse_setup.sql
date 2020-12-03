@@ -1,3 +1,20 @@
+/*
+
+Install-Module  Az.Accounts
+Import-Module Az.Accounts
+Connect-AzAccount
+Install-Module Az.Sql
+Import-Module Az.Sql
+Select-AzSubscription -SubscriptionId GetFromPortal
+Set-AzSqlServer -ResourceGroupName rgnamehere -ServerName servername -AssignIdentity     
+Then assign Storage Blob Data Contributor role in storageaccount to SQL DW Database server 
+
+
+*/
+
+
+
+
 Logins and users:
 Login into server xxx.database.windows.net master DB using dw_user admin account. Run commands below.
 
