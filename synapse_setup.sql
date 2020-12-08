@@ -104,44 +104,6 @@ MIN_PERCENTAGE_RESOURCE = 15
 , QUERY_EXECUTION_TIMEOUT_SEC = 0
 );
 
--- View Workload Groups
-
-SELECT group_id
-, name
-, importance
-, min_percentage_resource
-, parallelism = min_percentage_resource / request_min_resource_grant_percent
-, cap_percentage_resource
-, request_min_resource_grant_percent
-, request_max_resource_grant_percent
-, query_execution_timeout_sec
-, query_wait_timeout_sec
-FROM sys.workload_management_workload_groups;
-
--- View Workload Classifiers
-
-SELECT WC.classifier_id, WC.name, WC.group_name, WC.importance, WC.is_enabled, CD.classifier_type, CD.classifier_value
-FROM sys.workload_management_workload_classifiers WC
-INNER JOIN sys.workload_management_workload_classifier_details CD ON WC.classifier_id = CD.classifier_id;
-
--- View RunTime values
-
-SELECT wg.group_id
-, wg.name
-, effective_min_percentage_resource
-, requested_parallelism = min_percentage_resource / request_min_resource_grant_percent
-, effective_parallelism = min_percentage_resource * (effective_request_min_resource_grant_percent / 100)
-, effective_cap_percentage_resource
-, effective_request_min_resource_grant_percent
-, effective_request_max_resource_grant_percent
-, total_queued_request_count
-, total_shared_resource_requests
-, total_queued_request_count
-, total_request_execution_timeouts
-, total_resource_grant_timeouts
-FROM sys.dm_workload_management_workload_groups_stats st
-INNER JOIN sys.workload_management_workload_groups wg ON st.group_id = wg.group_id
-ORDER BY wg.group_id;
 
 
 
