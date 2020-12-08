@@ -1,12 +1,76 @@
 --SQL DW
-select top 100* from dbo.Query_stats_active_requests where classifier_Name is null or classifier_name not in ('username') order by status
-select top 100* from sys.workload_management_workload_classifiers 
-select top 100* from sys.dm_workload_management_workload_groups_stats
-select top 100* from  sys.dm_pdw_exec_sessions where login_name not in ('user') order by status
-select top 100* from  sys.workload_management_workload_groups
-select top 100* from sys.dm_pdw_exec_requests
 select COUNT_BIG(1) from sql dw table
 EXEC sp_spaceused N'schema.table';  
+
+--  Active Connections
+SELECT * FROM sys.dm_pdw_exec_sessions where status <> 'Closed' and session_id <> session_id();
+
+-- Monitor active queries
+SELECT *
+FROM sys.dm_pdw_exec_requests
+WHERE status not in ('Completed','Failed','Cancelled')
+  AND session_id <> session_id()
+ORDER BY submit_time DESC;
+
+-- Find top 10 queries longest running queries
+SELECT TOP 10 *
+FROM sys.dm_pdw_exec_requests
+ORDER BY total_elapsed_time DESC;
+
+-- Monitor waiting queries
+SELECT waits.session_id,
+      waits.request_id,  
+      requests.command,
+      requests.status,
+      requests.start_time,  
+      waits.type,
+      waits.state,
+      waits.object_type,
+      waits.object_name
+FROM   sys.dm_pdw_waits waits
+   JOIN  sys.dm_pdw_exec_requests requests
+   ON waits.request_id=requests.request_id
+WHERE 1=1 
+--and waits.request_id = 'QID####'
+ORDER BY waits.object_name, waits.object_type, waits.state;
+
+
+-- View Workload Groups
+SELECT group_id
+, name
+, importance
+, min_percentage_resource
+, parallelism = min_percentage_resource / request_min_resource_grant_percent
+, cap_percentage_resource
+, request_min_resource_grant_percent
+, request_max_resource_grant_percent
+, query_execution_timeout_sec
+, query_wait_timeout_sec
+FROM sys.workload_management_workload_groups;
+
+-- View Workload Classifiers
+
+SELECT WC.classifier_id, WC.name, WC.group_name, WC.importance, WC.is_enabled, CD.classifier_type, CD.classifier_value
+FROM sys.workload_management_workload_classifiers WC
+INNER JOIN sys.workload_management_workload_classifier_details CD ON WC.classifier_id = CD.classifier_id;
+
+-- View RunTime values
+SELECT wg.group_id
+, wg.name
+, effective_min_percentage_resource
+, requested_parallelism = min_percentage_resource / request_min_resource_grant_percent
+, effective_parallelism = min_percentage_resource * (effective_request_min_resource_grant_percent / 100)
+, effective_cap_percentage_resource
+, effective_request_min_resource_grant_percent
+, effective_request_max_resource_grant_percent
+, total_queued_request_count
+, total_shared_resource_requests
+, total_queued_request_count
+, total_request_execution_timeouts
+, total_resource_grant_timeouts
+FROM sys.dm_workload_management_workload_groups_stats st
+INNER JOIN sys.workload_management_workload_groups wg ON st.group_id = wg.group_id
+ORDER BY wg.group_id;
 
 /*Use below if more than 60M records
 Stage in etl schema as DISTRIBUTION ROUND_ROBIN (default), CLUSTERED COLUMNSTORE (default) > DISTRIBUTION HASH, CLUSTERED COLUMNSTORE
