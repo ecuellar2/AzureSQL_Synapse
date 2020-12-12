@@ -149,8 +149,16 @@ CREATE CREDENTIAL [https://xx.dfs.core.windows.net/container]
 WITH IDENTITY='SHARED ACCESS SIGNATURE',  
 SECRET = '?sv=%3D'
 
-select * from sys.external_file_formats 
+--OPENROWSET WITHOUT data_source, right click sql on demand
+CREATE CREDENTIAL [https://<storage_account>.dfs.core.windows.net/<container>] WITH IDENTITY='Managed Identity'
+select * from sys.credentials
+
+--OPENROWSET  with data_source, CREATE VIEW, CREATE EXTERNAL TABLE
+CREATE DATABASE SCOPED CREDENTIAL SynapseIdentity WITH IDENTITY = 'Managed Identity'; -- new syntax 
+CREATE DATABASE SCOPED CREDENTIAL SynapseIdentity WITH IDENTITY = 'Managed Service Identity'; -- legacy syntax
 select * from sys.database_scoped_credentials
+
+select * from sys.external_file_formats 
 select * from sys.external_data_sources
 select * from sys.external_tables
 
