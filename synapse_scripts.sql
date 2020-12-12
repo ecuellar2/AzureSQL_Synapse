@@ -144,9 +144,13 @@ order by 3
 -- create credentials for container using sql on demand
 IF EXISTS (SELECT * FROM sys.credentials WHERE name = 'https://xx.dfs.core.windows.net/container')
 DROP CREDENTIAL [https://xx.dfs.core.windows.net/container]
-Go
 
 CREATE CREDENTIAL [https://xx.dfs.core.windows.net/container]
 WITH IDENTITY='SHARED ACCESS SIGNATURE',  
 SECRET = '?sv=%3D'
-Go
+
+select * from sys.external_file_formats 
+select * from sys.database_scoped_credentials
+select * from sys.external_data_sources
+select * from sys.external_tables
+
