@@ -32,3 +32,49 @@ FILE_FORMAT = [ParquetFormat] );
 
 CREATE VIEW name_vw AS SELECT * FROM 
 OPENROWSET(BULK '/parquet/testdata/*.parquet', DATA_SOURCE = 'accountname',FORMAT='PARQUET') AS [r];
+
+ /*
+Create container using same name as workspace in storage account. 
+This account appears used only for synapse logging such as pool logs, metadata, metastore definition. 
+Create workspace. This step gives storage blob data contributor RBAC to  MI in the container in storage account.
+Leave enabled:  Allow pipelines (running as workspace's system assigned identity) to access SQL pools.
+Select the Managed virtual network enable (check all) during creation, can't be change later.
+
+After deployment:
+Add dev groups to workspace, spark, sql admin in workspace.
+Add the dev group as contributor for the synapse resource RBAC. (may not be needed) for azure runtime to enable interactive authoring 
+Go to firewall, enable "allow azure resources to access workspace"
+Create linked services.
+Enable interactive authoring with 60 min timeout.
+Update SQL active directory admin.
+Confirm settings needed for workspace firewall config.
+Go to workspace, click managed private endpoint, click add.
+Create spark pools. Run show databases command to assure metastore access works. Test a data frame.
+val df = spark.read.format("delta").load("abfss://container@account.dfs.core.windows.net/folderpath/")
+
+Create SQL pool. 
+-- do this for workspace MI in all sql pool 
+CREATE USER [workspacename] FROM EXTERNAL PROVIDER;
+GRANT CONTROL ON DATABASE::dbname TO workspacename;
+Grant permissions. In serverless SQL pool Synapse Administrators are granted dbo. In dedicated SQL pools Active Directory Admin is dbo.
+
+Serverless SQL pool
+use master
+go
+CREATE LOGIN [alias@domain.com] FROM EXTERNAL PROVIDER;
+use yourdb -- Use your database name
+go
+CREATE USER alias FROM LOGIN [alias@domain.com];
+-- run permissions in master for all serverless SQL pools or run in specific DB to scope permissions
+
+Dedicated pool
+--Create user and permissions in the database
+CREATE USER [<alias@domain.com>] FROM EXTERNAL PROVIDER;
+
+
+
+
+       
+          
+          
+ */
