@@ -96,6 +96,7 @@ SELECT pr.principal_id, pr.name, pr.type_desc, pr.authentication_type_desc, pe.s
 FROM sys.database_principals AS pr  
 JOIN sys.database_permissions AS pe ON pe.grantee_principal_id = pr.principal_id
 left outer JOIN sys.schemas  as sch on pe.major_id = sch.schema_id
+where pr.name not in ('public')
 
 -- permissions for a schema
 DECLARE @SCHEMA varchar(255) = 'schema_name'
