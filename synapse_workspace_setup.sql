@@ -7,6 +7,8 @@ select * from sys.credentials
 --Also used for  SELECT * FROM OPENROWSET(BULK 'foo/*.parquet', DATA_SOURCE = 'x', FORMAT='PARQUET') as rows
 CREATE DATABASE SCOPED CREDENTIAL SynapseIdentity WITH IDENTITY = 'Managed Identity'; -- new syntax 
 CREATE DATABASE SCOPED CREDENTIAL SynapseIdentity WITH IDENTITY = 'Managed Service Identity'; -- legacy syntax
+GRANT REFERENCES  ON DATABASE SCOPED CREDENTIAL ::[xx] TO [x]; -- for users that do not have access to the workspace but have DB level permission to serverless pool
+
 select * from sys.database_scoped_credentials
 
 --To run pipelines that reference a dedicated SQL pool, the workspace identity needs access
