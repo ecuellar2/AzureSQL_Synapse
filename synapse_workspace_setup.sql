@@ -9,7 +9,7 @@ CREATE DATABASE SCOPED CREDENTIAL SynapseIdentity WITH IDENTITY = 'Managed Ident
 CREATE DATABASE SCOPED CREDENTIAL SynapseIdentity WITH IDENTITY = 'Managed Service Identity'; -- legacy syntax
 select * from sys.database_scoped_credentials
 
---To run pipelines that reference a SQL pool, the workspace identity needs access
+--To run pipelines that reference a dedicated SQL pool, the workspace identity needs access
 CREATE USER [<workspacename>] FROM EXTERNAL PROVIDER;
 GRANT CONTROL ON DATABASE::<databasename> TO <workspacename>;
 
