@@ -4,20 +4,27 @@ select * from sys.credentials
 
 --OPENROWSET  with data_source, used in CREATE VIEW, CREATE EXTERNAL TABLE
 --Also used for  SELECT * FROM OPENROWSET(BULK 'foo/*.parquet', DATA_SOURCE = 'x', FORMAT='PARQUET') as rows
+--steps below for dedicated and serverless pools
 CREATE MASTER KEY; -- if needed
 CREATE DATABASE SCOPED CREDENTIAL SynapseIdentity WITH IDENTITY = 'Managed Identity'; -- new syntax 
 CREATE DATABASE SCOPED CREDENTIAL SynapseIdentity WITH IDENTITY = 'Managed Service Identity'; -- legacy syntax
 GRANT REFERENCES  ON DATABASE SCOPED CREDENTIAL ::[xx] TO [x]; -- for users that do not have access to the workspace but have DB level permission to serverless pool
-
 select * from sys.database_scoped_credentials
 
 --To run pipelines that reference a dedicated SQL pool, the workspace identity needs access
 CREATE USER [<workspacename>] FROM EXTERNAL PROVIDER;
 GRANT CONTROL ON DATABASE::<databasename> TO <workspacename>;
 
+-- non admin permissions
+CREATE USER [xx] FROM EXTERNAL PROVIDER;
 EXEC sp_addrolemember 'db_datareader', 'xx'; -- dedicated pool
-ALTER ROLE db_ddladmin ADD MEMBER xxx;      -- serverless pool
+ALTER ROLE db_ddladmin ADD MEMBER xxx;      -- serverless pool (don't use default or master hive db)
 GRANT ADMINISTER DATABASE BULK OPERATIONS TO [xx]; 
+
+--Use this only if you want to grant full access to all serverless SQL pools in the workspace
+use master
+CREATE LOGIN [xx] FROM EXTERNAL PROVIDER;
+ALTER SERVER ROLE sysadmin ADD MEMBER [xx];
 
 select * from sys.external_file_formats 
 select * from sys.external_data_sources
