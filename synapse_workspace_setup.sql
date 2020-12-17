@@ -15,7 +15,8 @@ select * from sys.database_scoped_credentials
 CREATE USER [<workspacename>] FROM EXTERNAL PROVIDER;
 GRANT CONTROL ON DATABASE::<databasename> TO <workspacename>;
 
-EXEC sp_addrolemember 'db_datareader', 'xx';
+EXEC sp_addrolemember 'db_datareader', 'xx'; -- dedicated pool
+ALTER ROLE db_ddladmin ADD MEMBER xxx;      -- serverless pool
 GRANT ADMINISTER DATABASE BULK OPERATIONS TO [xx]; 
 
 select * from sys.external_file_formats 
