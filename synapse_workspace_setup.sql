@@ -30,8 +30,9 @@ select * from sys.external_file_formats
 CREATE EXTERNAL FILE FORMAT uncompressedparquet WITH ( FORMAT_TYPE = PARQUET);  
 CREATE EXTERNAL FILE FORMAT snappyparquet WITH (  FORMAT_TYPE = PARQUET, DATA_COMPRESSION = 'org.apache.hadoop.io.compress.SnappyCodec');  
 
-select * from sys.external_data_sources
+select * from sys.external_data_sources -- remove TYPE parameter below for serverless
 CREATE EXTERNAL DATA SOURCE [storage_acct]  WITH (TYPE = HADOOP, LOCATION = N'abfss://container@accountname.dfs.core.windows.net',  CREDENTIAL = [mi_cred])
+
 
 select * from sys.external_tables
 CREATE EXTERNAL TABLE dbo.table_name -- dedicated pool example 
