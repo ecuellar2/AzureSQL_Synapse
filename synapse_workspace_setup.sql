@@ -1,6 +1,5 @@
---Create credential for serverless sql pool
 --Synapse OPENROWSET WITHOUT data_source, right click sql on demand
-CREATE CREDENTIAL [https://<storage_account>.dfs.core.windows.net/<container>] WITH IDENTITY='Managed Identity'
+CREATE CREDENTIAL [https://<storage_account>.dfs.core.windows.net/<container>] WITH IDENTITY='Managed Identity' -- this step is for serverless only
 select * from sys.credentials
 
 --OPENROWSET  with data_source, used in CREATE VIEW, CREATE EXTERNAL TABLE
