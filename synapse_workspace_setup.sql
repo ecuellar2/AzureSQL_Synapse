@@ -34,11 +34,18 @@ select * from sys.external_data_sources
 CREATE EXTERNAL DATA SOURCE [storage_acct]  WITH (TYPE = HADOOP, LOCATION = N'abfss://container@accountname.dfs.core.windows.net',  CREDENTIAL = [mi_cred])
 
 select * from sys.external_tables
-CREATE EXTERNAL TABLE dbo.table_name
+CREATE EXTERNAL TABLE dbo.table_name -- dedicated pool example 
 ( [id] [smallint] NULL,
 [value]  [varchar](50) NULL)
 WITH ( LOCATION = 'parquet/testdata/',
-DATA_SOURCE = [storage_accta],
+DATA_SOURCE = [storage_acct],
+FILE_FORMAT = [ParquetFormat] );
+
+CREATE EXTERNAL TABLE dbo.ext_table_deleteme -- serverless pool example
+( [id] [int] ,
+[value]  [varchar](50) )
+WITH ( LOCATION = 'parquet/testdata/',
+DATA_SOURCE = [storage_acct],
 FILE_FORMAT = [ParquetFormat] );
 
 CREATE VIEW name_vw AS SELECT * FROM 
