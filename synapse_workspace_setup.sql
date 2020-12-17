@@ -27,15 +27,13 @@ CREATE LOGIN [xx] FROM EXTERNAL PROVIDER;
 ALTER SERVER ROLE sysadmin ADD MEMBER [xx];
 
 select * from sys.external_file_formats 
+CREATE EXTERNAL FILE FORMAT uncompressedparquet WITH ( FORMAT_TYPE = PARQUET);  
+CREATE EXTERNAL FILE FORMAT snappyparquet WITH (  FORMAT_TYPE = PARQUET, DATA_COMPRESSION = 'org.apache.hadoop.io.compress.SnappyCodec');  
+
 select * from sys.external_data_sources
-select * from sys.external_tables
-
-IF EXISTS (SELECT * FROM sys.credentials WHERE name = 'https://xx.dfs.core.windows.net/container')
-DROP CREDENTIAL [https://xx.dfs.core.windows.net/container]
-CREATE CREDENTIAL [https://xx.dfs.core.windows.net/container] WITH IDENTITY='SHARED ACCESS SIGNATURE',  SECRET = '?sv=%3D'
-
 CREATE EXTERNAL DATA SOURCE [storage_acct]  WITH (TYPE = HADOOP, LOCATION = N'abfss://container@accountname.dfs.core.windows.net',  CREDENTIAL = [mi_cred])
 
+select * from sys.external_tables
 CREATE EXTERNAL TABLE dbo.table_name
 ( [id] [smallint] NULL,
 [value]  [varchar](50) NULL)
@@ -45,6 +43,12 @@ FILE_FORMAT = [ParquetFormat] );
 
 CREATE VIEW name_vw AS SELECT * FROM 
 OPENROWSET(BULK '/parquet/testdata/*.parquet', DATA_SOURCE = 'accountname',FORMAT='PARQUET') AS [r];
+
+-- if sas token needed
+IF EXISTS (SELECT * FROM sys.credentials WHERE name = 'https://xx.dfs.core.windows.net/container')
+DROP CREDENTIAL [https://xx.dfs.core.windows.net/container]
+CREATE CREDENTIAL [https://xx.dfs.core.windows.net/container] WITH IDENTITY='SHARED ACCESS SIGNATURE',  SECRET = '?sv=%3D'
+
 
  /*
 Create container using same name as workspace in storage account. 
