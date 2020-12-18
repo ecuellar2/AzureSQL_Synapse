@@ -85,12 +85,10 @@ Grant permissions. In serverless SQL pool Synapse Administrators are granted dbo
 
 Serverless SQL pool
 use master
-go
 CREATE LOGIN [alias@domain.com] FROM EXTERNAL PROVIDER;
 use yourdb -- Use your database name
-go
 CREATE USER alias FROM LOGIN [alias@domain.com];
--- run permissions in master for all serverless SQL pools or run in specific DB to scope permissions
+
 
 Dedicated pool
 --Create user and permissions in the database
