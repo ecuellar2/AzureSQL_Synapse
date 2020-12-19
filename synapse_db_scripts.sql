@@ -1,3 +1,22 @@
+
+-- users and roles 
+SELECT DP1.name AS DatabaseRoleName,   
+   isnull (DP2.name, 'No members') AS DatabaseUserName   
+ FROM sys.database_role_members AS DRM  
+ RIGHT OUTER JOIN sys.database_principals AS DP1  
+   ON DRM.role_principal_id = DP1.principal_id  
+ LEFT OUTER JOIN sys.database_principals AS DP2  
+   ON DRM.member_principal_id = DP2.principal_id  
+WHERE DP1.type = 'R'
+ORDER BY DP1.name;  
+
+-- db permissions 
+SELECT pr.principal_id, pr.name, pr.type_desc, pr.authentication_type_desc, pe.state_desc, pe.permission_name, sch.name
+FROM sys.database_principals AS pr  
+JOIN sys.database_permissions AS pe ON pe.grantee_principal_id = pr.principal_id
+left outer JOIN sys.schemas  as sch on pe.major_id = sch.schema_id
+where pr.name not in ('public')
+
 --SQL DW
 select COUNT_BIG(1) from sql dw table
 EXEC sp_spaceused N'schema.table';  
@@ -77,26 +96,6 @@ Stage in etl schema as DISTRIBUTION ROUND_ROBIN (default), CLUSTERED COLUMNSTORE
 Use below if less than 60M records
 Stage in etl schema as DISTRIBUTION ROUND_ROBIN, HEAP > DISTRIBUTION HASH, CLUSTERED COLUMNSTORE
 */
-
-
-
--- users and roles 
-SELECT DP1.name AS DatabaseRoleName,   
-   isnull (DP2.name, 'No members') AS DatabaseUserName   
- FROM sys.database_role_members AS DRM  
- RIGHT OUTER JOIN sys.database_principals AS DP1  
-   ON DRM.role_principal_id = DP1.principal_id  
- LEFT OUTER JOIN sys.database_principals AS DP2  
-   ON DRM.member_principal_id = DP2.principal_id  
-WHERE DP1.type = 'R'
-ORDER BY DP1.name;  
-
--- db permissions 
-SELECT pr.principal_id, pr.name, pr.type_desc, pr.authentication_type_desc, pe.state_desc, pe.permission_name, sch.name
-FROM sys.database_principals AS pr  
-JOIN sys.database_permissions AS pe ON pe.grantee_principal_id = pr.principal_id
-left outer JOIN sys.schemas  as sch on pe.major_id = sch.schema_id
-where pr.name not in ('public')
 
 -- permissions for a schema
 DECLARE @SCHEMA varchar(255) = 'schema_name'
