@@ -49,6 +49,7 @@ WITH ( LOCATION = 'parquet/testdata/',
 DATA_SOURCE = [storage_acct],
 FILE_FORMAT = [ParquetFormat] );
 
+-- OPENROWSET only supported in serverless pool 
 CREATE VIEW name_vw AS SELECT * FROM 
 OPENROWSET(BULK '/parquet/testdata/*.parquet', DATA_SOURCE = 'accountname',FORMAT='PARQUET') AS [r];
 
