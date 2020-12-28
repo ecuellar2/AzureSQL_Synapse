@@ -7,6 +7,7 @@ Install-Module Az.Sql
 Import-Module Az.Sql
 Select-AzSubscription -SubscriptionId GetFromPortal
 Set-AzSqlServer -ResourceGroupName rgnamehere -ServerName servername -AssignIdentity     
+Use only first part of server name without .database.windows.net
 Then assign Storage Blob Data Contributor role in storageaccount to SQL DW Database server 
 
 
