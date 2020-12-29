@@ -19,7 +19,7 @@ GRANT CONTROL ON DATABASE::<databasename> TO <workspacename>;
 CREATE USER [xx] FROM EXTERNAL PROVIDER;
 EXEC sp_addrolemember 'db_datareader', 'xx'; -- dedicated pool
 ALTER ROLE db_ddladmin ADD MEMBER xxx;      -- serverless pool (don't use default or master hive db)
-GRANT ADMINISTER DATABASE BULK OPERATIONS TO [xx]; 
+GRANT ADMINISTER DATABASE BULK OPERATIONS TO [xx]; -- for OPENROWSET 
 
 --Use this only if you want to grant full access to all serverless SQL pools in the workspace
 use master
