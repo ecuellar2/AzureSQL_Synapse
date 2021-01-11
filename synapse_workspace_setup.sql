@@ -18,8 +18,12 @@ GRANT CONTROL ON DATABASE::<databasename> TO <workspacename>;
 -- non admin permissions
 CREATE USER [xx] FROM EXTERNAL PROVIDER;
 EXEC sp_addrolemember 'db_datareader', 'xx'; -- dedicated pool
-ALTER ROLE db_ddladmin ADD MEMBER xxx;      -- serverless pool (don't use default or master hive db)
-GRANT ADMINISTER DATABASE BULK OPERATIONS TO [xx]; -- for OPENROWSET 
+GRANT ALTER ANY EXTERNAL DATA SOURCE TO [xx]; -- to create external tables in dedicated pool
+GRANT ALTER ANY EXTERNAL FILE FORMAT TO [xx]; -- to create external tables in dedicated pool
+
+ALTER ROLE db_ddladmin ADD MEMBER xxx;      -- when using serverless pool don't use default or master hive db
+GRANT ADMINISTER DATABASE BULK OPERATIONS TO [xx]; -- for OPENROWSET in serverless pool 
+
 
 --Use this only if you want to grant full access to all serverless SQL pools in the workspace
 use master
