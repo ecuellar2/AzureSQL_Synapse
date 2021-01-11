@@ -1,3 +1,6 @@
+--delete tokens below for data studio token issue
+%userprofile%\AppData\Roaming\azuredatastudio\Azure Accounts
+
 
 -- permissions list
 SELECT users.name as user_name, users.uid as user_id, db_principal.name, db_principal.type_desc 
