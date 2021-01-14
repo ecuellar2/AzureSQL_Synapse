@@ -140,5 +140,36 @@ WHERE 1 = 1
 GROUP BY sm.name, tb.name
 order by 3
 ====================================
+-- serverless sql pool monitor query history, everything that has run for the last 30 days. 
 
+SELECT * FROM (SELECT *, COUNT(*) OVER() AS total_count, ROW_NUMBER() OVER( ORDER BY r.start_time desc) as [rownum] FROM 
+(SELECT req.status as [status],req.transaction_id as [request_id],'SQL On-demand' as [SQL Resource],
+s.login_name as [login_name],CAST(s.session_id as VARCHAR) as [session_id],
+req.start_time as [submit_time],req.start_time as [start_time],
+Null as [end_time],req.command as [command_clause],
+SUBSTRING(sqltext.text,(req.statement_start_offset/2)+1,
+((CASE req.statement_end_offset WHEN -1 THEN DATALENGTH(sqltext.text) 
+ELSE req.statement_end_offset END - req.statement_start_offset)/2) + 1) as [command],
+req.total_elapsed_time as [duration],'N/A' as [queued_duration],
+req.total_elapsed_time as [running_duration],'N/A' as [data_processed_in_MB],
+'N/A' as [group_name],'N/A' as [source],'N/A' as [pipeline],'N/A' as [importance],
+'N/A' as [classifier_name],'N/A' as [data_processed_in_bytes] 
+FROM sys.dm_exec_requests req 
+CROSS APPLY sys.dm_exec_sql_text(sql_handle) sqltext 
+JOIN sys.dm_exec_sessions s ON req.session_id = s.session_id  and s.session_id not in 
+(select distinct Session_Id FROM sys.dm_exec_requests req 
+CROSS APPLY sys.dm_exec_sql_text(sql_handle) sqltext 
+WHERE SUBSTRING(sqltext.text,(req.statement_start_offset/2)+1,
+((CASE req.statement_end_offset WHEN -1 THEN DATALENGTH(sqltext.text)
+ELSE req.statement_end_offset END - req.statement_start_offset) / 2) + 1)  like'%@@Azure.Synapse.Monitoring.SQLQuerylist%')
+UNION SELECT h.status as [status],h.transaction_id as [request_id],'SQL On-Demand' as [SQL Resource],
+h.login_name as [login_name],'N/A' as [session_id],h.start_time as [submit_time],h.start_time as [start_time],
+h.end_time as [end_time],h.command as [command_clause],h.query_text as [command],
+h.total_elapsed_time_ms as [duration],'N/A' as [queued_duration],h.total_elapsed_time_ms as [running_duration],
+CAST(h.data_processed_mb as VARCHAR) as [data_processed_in_MB],'N/A' as [group_name],
+'N/A' as [source],'N/A' as [pipeline],'N/A' as [importance],'N/A' as [classifier_name],
+'N/A' as [data_processed_in_bytes] FROM sys.dm_exec_requests_history h) as r 
+where ((r.start_time >= CONVERT(datetime,'2020-12-14T11:54:21Z') 
+and r.start_time <= CONVERT(datetime,'2021-01-13T11:54:21Z')))) as final_dataset_output 
+WHERE final_dataset_output.rownum between 0 and 100
 
