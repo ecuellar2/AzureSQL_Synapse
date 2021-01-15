@@ -1,5 +1,7 @@
 --delete tokens below for data studio token issue
 %userprofile%\AppData\Roaming\azuredatastudio\Azure Accounts
+--connect using MI
+Server=xxx.database.windows.net,1433;Initial Catalog=db_name;
 
 
 -- permissions list
