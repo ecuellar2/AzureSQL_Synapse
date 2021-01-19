@@ -21,6 +21,10 @@ EXEC sp_addrolemember 'db_datareader', 'xx'; -- dedicated pool
 GRANT ALTER ANY EXTERNAL DATA SOURCE TO [xx]; -- to create external tables in dedicated pool
 GRANT ALTER ANY EXTERNAL FILE FORMAT TO [xx]; -- to create external tables in dedicated pool
 
+-- To view sys objects in dedicated pool
+GRANT VIEW DATABASE STATE TO [xx];  
+GRANT VIEW DEFINITION TO [xx];
+
 ALTER ROLE db_ddladmin ADD MEMBER xxx;      -- when using serverless pool don't use default or master hive db
 GRANT ADMINISTER DATABASE BULK OPERATIONS TO [xx]; -- for OPENROWSET in serverless pool 
 
