@@ -19,13 +19,13 @@ Then assign Storage Blob Data Contributor role in storageaccount to SQL DW Datab
 Logins and users:
 Login into server xxx.database.windows.net master DB using dw_user admin account. Run commands below.
 
-CREATE LOGIN loader_user WITH PASSWORD = 'putpwhere'; 
-CREATE USER loader_user FOR LOGIN loader_user; 
-EXEC sp_addrolemember 'dbmanager', 'loader_user';  -- for auto scaling
+CREATE LOGIN xx WITH PASSWORD = 'putpwhere'; 
+CREATE USER xx FOR LOGIN loader_user; 
+EXEC sp_addrolemember 'dbmanager', 'xx';  -- for auto scaling if needed
 
 Log into DB as dw_user admin account. Run commands below.
-CREATE USER loader_user FOR LOGIN loader_user;
-GRANT CONTROL ON DATABASE::[dbname] to loader_user; 
+CREATE USER xx FOR LOGIN loader_user;
+GRANT CONTROL ON DATABASE::[dbname] to xx; 
 
 CREATE MASTER KEY;  
 
