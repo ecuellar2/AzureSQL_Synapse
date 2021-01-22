@@ -20,6 +20,7 @@ CREATE USER [xx] FROM EXTERNAL PROVIDER;
 EXEC sp_addrolemember 'db_datareader', 'xx'; -- dedicated pool
 GRANT ALTER ANY EXTERNAL DATA SOURCE TO [xx]; -- to create external tables in dedicated pool
 GRANT ALTER ANY EXTERNAL FILE FORMAT TO [xx]; -- to create external tables in dedicated pool
+GRANT SHOWPLAN TO [xx];   --- to use EXPLAIN [WITH_RECOMMENDATIONS] in dedicated pool
 
 -- To view sys objects in dedicated pool
 GRANT VIEW DATABASE STATE TO [xx];  
